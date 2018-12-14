@@ -1,0 +1,5 @@
+/node_modules/
+/prod_config.yml
+/.project
+/prod_config_encrypted.txt
+/package-lock.json
