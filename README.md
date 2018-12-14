@@ -1,8 +1,8 @@
-#Triggered Lambda Sends Email or SMS
+# Triggered Lambda Sends Email or SMS
 
 Custom application looks for new files in an S3 bucket and sends an alert to subscribed users via AWS SNS
 
-##Installing Locally
+## Installing Locally
 
 ### Step 1: Clone the repository
 Clone this repository
@@ -63,7 +63,7 @@ $ aws kms encrypt --key-id {key-id} --plaintext fileb://prod_config.yml --output
 serverless invoke local --function sendAlert --path s3_event_alert.json
 ```
 
-##Installing in AWS Lambda
+## Installing in AWS Lambda
 
 1. Download and setup the application, see Installing locally
 2. Edit serverless.yml so it include your key ARN
