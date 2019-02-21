@@ -7,18 +7,9 @@ const yaml = require('js-yaml');
 const s3 = new aws.S3();
 const sns = new aws.SNS();
 
-const kms = new aws.KMS({'region': 'us-east-1'});
-let environment = 'prod';
-const params = {
-  CiphertextBlob: fs.readFileSync(environment + "_config_encrypted.txt")
-}
-
-exports.handler = async (event) => {
+exports.handler = async (event, context) => {
+	const account_id = JSON.stringify(context.invokedFunctionArn).split(':')[4];
 	try {
-		let data = await kms.decrypt(params).promise();
-		
-		let config = yaml.load(data['Plaintext'].toString());
-		
 		// Get the object from the event and show its content type
 	    const bucket = event.Records[0].s3.bucket.name;
 	    const key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
@@ -28,7 +19,7 @@ exports.handler = async (event) => {
 	        let sns_response = await sns.publish({
 	            Message: key + 'published to S3 bucket named' + bucket,
 	            //PhoneNumber:
-	            TopicArn: config['topic_arn']}).promise();
+	            TopicArn: "arn:" + process.env.AWS_REGION ":sns:" + account_id +  process.env.snsTopic;
 	        console.log(sns_response.MessageId);
 	        console.log("message successfully sent")
 	    }catch (Error){

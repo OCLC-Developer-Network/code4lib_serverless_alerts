@@ -1,5 +1,7 @@
 service: 
     name: trigger-alert-test
+custom:
+  snsTopic: filePutAlert
 provider:
  name: aws
  runtime: nodejs8.10
@@ -7,7 +9,25 @@ provider:
  timeout: 10
  stage: production
  region: us-east-1
+ environment:
+  snsTopic: ${self:custom.snsTopic}
+ iamRoleStatements:
+    - Effect: Allow
+      Action:
+       - kms:Decrypt
+      Resource: { "Fn::Join" : ["", ["arn:aws:kms:${self:provider.region}:", { "Ref" : "AWS::AccountId" }, ":key/662c685a-51e7-45a7-ad0d-478863112001" ] ]  }
+    - Effect: Allow
+      Action:
+       - SNS:Publish
+      Resource: { "Fn::Join" : ["", ["arn:aws:sns:${self:provider.region}:", { "Ref" : "AWS::AccountId" }, ":${self:custom.snsTopic}" ] ]  }
 
 functions:
     sendAlert: 
         handler: index.handler
+
+resources:
+  Resources:
+    AlertTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:custom.snsTopic}         
